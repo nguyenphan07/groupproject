@@ -5,24 +5,67 @@
 """
 #System import
 from random import randint
-
+import time
 #Global Variable
-global NAME
 NAME: str = input("Please enter your character's name: ") # Allow the player to name their character
 print(f"Welcome {NAME} to the game!")
 
 #Functions
 
 def validation_check(choice: str, possibility: list[str]) -> str:
-    """ Checks if user's input is eligible"""
+    """
+    Checks if user's input is eligible
+
+    Parameters:
+    ------
+        choice: str
+            the input from the user
+        possibility: list[str]
+            the list of possible choices users can put
+    Returns:
+    ------
+        str
+            the final input that is in the list of possible choices
+    """
     while not choice in possibility: # Activates if user inputs an ineligible choice, looping until user input a possible choice
         choice = input("Not an option, please try again: ")
     return choice # The function returns a possible choice (passed validation check)
 
+def game_over() -> str:
+    """
+    Allows player to restart the chapter or exit the game once they lose
 
+    Returns
+    -------
+    str
+        either 'restart' to restart the chapter or 'exit' to exit the game
+    """
+    print("GAME OVER! Would you like to: \n1. Restart the chapter \n2. Exit the game")
+    while True:
+        try:
+            choice = int(input("Type '1' or '2': "))
+            if choice == 1:
+                return "restart"
+            elif choice == 2:
+                return "exit"
+            else:
+                print("Please type a valid number!")
+        except ValueError:
+            print("Error! Remember to type in a number!")
 
 def random_event(strength_random: int) -> tuple:
-    """Adding random events in dark forest"""
+    """Adding random events in dark forest
+    
+    Parameters:
+    ------
+        strength_random: int
+            The total strength points the player has before this random event occurs
+    
+    Returns:
+    ------
+        tuple
+            Returns status whether player lost or survived, along with total strength points
+    """
     treasure: dict[str, int] ={     # Treasure is a dictionary with keys as items and value as strength points gained from obtaining the treasure
         "sword": 10,
         "shield": 5,
@@ -67,16 +110,10 @@ def random_event(strength_random: int) -> tuple:
 
 
         else: #Player choose to fight but does not have enough strength points
-            print(f"You have been slain by the {monster_order[i]}.\nGAME OVER!")
-            print("1. Restart the chapter\n2. Exit the game")
-            decision = input("Type '1' or '2'")
-            decision = validation_check(decision, possibility)
-            if decision == "1": # Restart
-                return "restart", strength_random
-            else: # Exit
-                return "exit", strength_random
+            print(f"You have been slain by the {monster_order[i]}.")
+            return game_over(), strength_random
+            
     return "alive", strength_random
-
 
 def dark_forest() -> str | None:
     """Function to run dark forest chapter"""
@@ -139,30 +176,24 @@ def dark_forest() -> str | None:
 
                 
             else: #Follow the wavy path
-                print("The path gets darker and darker. Suddenly, you don't know where you are anymore. You are lost.\nGAME OVER!")
-                print("Do you want to:\n1. Restart the chapter\n2. Exit the game")
-                decision = input("Type '1' or '2': ")
-                print("+-----------------------------------------------------------------+")
-                decision = validation_check(decision, two_possibility)
-                if decision == "1":
+                print("The path gets darker and darker. Suddenly, you don't know where you are anymore. You are lost.")
+                decision = game_over()
+                if decision == "restart":
                     strength = starting_strength
                     continue
                 else:
                     return #end the function while returning nothing
-        i = 1
-        while i <= 3: # intended 3 randomized events
+                
+        for i in range(3): # intended 3 randomized events
             print("+-----------------------------------------------------------------+")
             print("continue? press '1'")
             one_possibility = ['1']
             decision = input()
             decision = validation_check(decision, one_possibility)
             status, strength = random_event(strength)
-            if status == "restart":
-                break #stop the random event loop
-            elif status == "exit":
-                break #stop the random event loop
-            else:
-                i += 1
+            if status != "alive":
+                break
+            
         if status == "restart": #Restarts the chapter
             strength = starting_strength
             continue
@@ -256,10 +287,7 @@ def dungeon():
                 print("Dealer wins!")
             else:
                 print("Tie! The house always wins!")
-        print("Do you want to:\n1. Restart the chapter\n2. Exit the game")
-        decision = input("Type '1' or '2': ")
-        print("+-----------------------------------------------------------------+")
-        decision = validation_check(decision, two_possibility)
+        decision = game_over()
         if decision == "1": 
             continue
         if decision == "2":
@@ -352,23 +380,20 @@ def maze_section(): # https://learn.zybooks.com/zybook/NORMANDALECSCI1101Running
             return "complete"
         else:
             print("You become lost and are trapped in the maze forever.")
-            print("Do you want to:\n1. Restart the chapter\n2. Exit the game")
-            decision = input("Type '1' or '2': ")
-            two_possibility: list[str] = ["1", "2"]
-            print("+-----------------------------------------------------------------+")
-            decision = validation_check(decision, two_possibility)
-            if decision == "1":
+            decision = game_over()
+            if decision == "1": 
                 continue
-            else:
-                return #end the function while returning nothing
+            if decision == "2":
+                break
 
 
+if __name__ == "__main__":
 
-if dark_forest() == "complete":
-    if dungeon() == "complete":
-        if maze_section() == "complete":
-            print("== END OF MAZE ==")
-            print(f"Congrats {NAME}, you have beat the game!")
+    if dark_forest() == "complete":
+        if dungeon() == "complete":
+            if maze_section() == "complete":
+                print("== END OF MAZE ==")
+                print(f"Congrats {NAME}, you have beat the game!")
 
 
 
