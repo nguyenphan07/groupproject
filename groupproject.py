@@ -10,6 +10,8 @@ import time
 NAME: str = input("Please enter your character's name: ") # Allow the player to name their character
 print(f"Welcome {NAME} to the game!")
 
+TIME_LIMIT = 600  # 10 minute time limit to finish the adventure
+START_TIME = time.time()
 #Functions
 
 def validation_check(choice: str, possibility: list[str]) -> str:
@@ -52,6 +54,33 @@ def game_over() -> str:
                 print("Please type a valid number!")
         except ValueError:
             print("Error! Remember to type in a number!")
+def check_time() -> bool:
+    """
+    Checks how much time has elapsed and how much the player has left
+
+    Returns
+    -------
+    bool
+        true if time there is time remaining, and false if there is not
+    """
+    try:
+        elapsed = time.time() - START_TIME
+        remaining = TIME_LIMIT - elapsed
+
+        print("\n=== TIME CHECK ===")
+        print(f"Time elapsed: {int(elapsed)} seconds")
+        print(f"Time remaining: {max(0, int(remaining))} seconds")
+
+        if remaining <= 0:
+            print("Time has run out!")
+            print("Game Over!")
+            return False
+
+        return True
+
+    except Exception:
+        print("Timer error.")
+        return False
 
 def random_event(strength_random: int) -> tuple:
     """Adding random events in dark forest
@@ -200,6 +229,10 @@ def dark_forest() -> str | None:
         elif status == "exit": #Exit the chapter
             return
         print("You finally found the dungeon hidden inside the forest. Wondering what's waiting for you... Chapter 1 complete!")
+
+        if not check_time():
+            return
+       
         return "complete"
 
 
@@ -216,7 +249,7 @@ def dark_forest() -> str | None:
 
 ## Dice used for randomness
 ## Other lists and dictionaries used 
-def dungeon():
+def dungeon() -> str | None:
     "Runs the dungeon portion of the game."
     while True:
         # d6 = random.randint(1, 6) #WIP
@@ -279,9 +312,17 @@ def dungeon():
 
             if dealer > 21:
                 print("Dealer busts! You win!")
+                
+                if not check_time():
+                    return
+                
                 return "complete" #End the function while returning "complete"
             elif player > dealer:
                 print("You win!")
+
+                if not check_time():
+                    return
+                
                 return "complete" #End the function while returning "complete"
             elif player < dealer:
                 print("Dealer wins!")
@@ -295,7 +336,7 @@ def dungeon():
         return #End the function while returning nothing
 
 """Daniel's maze section """
-def maze_section(): # https://learn.zybooks.com/zybook/NORMANDALECSCI1101RunningenFall2026/chapter/13/section/1
+def maze_section() -> str | None: 
     """
     Runs the maze portion of the adventure game.
     The player must make choices to find the exit.
@@ -313,8 +354,7 @@ def maze_section(): # https://learn.zybooks.com/zybook/NORMANDALECSCI1101Running
                 "You reach your first intersection.\n"
                 "Choose LEFT, RIGHT, or FORWARD: ").lower() #converts user input to lower case to prevent discrepancies
             if choice1 in ["left", "right", "forward"]:
-                break # https://learn.zybooks.com/zybook/NORMANDALECSCI1101RunningenFall2026/chapter/11/section/11 
-                    # break is used to stop the loop if user enters correct input
+                break # break is used to stop the loop if user enters correct input
             print("Invalid choice. Please type LEFT, RIGHT, or FORWARD.")
 
         if choice1 == "left":
@@ -374,9 +414,17 @@ def maze_section(): # https://learn.zybooks.com/zybook/NORMANDALECSCI1101Running
         if correct_paths >= 3:
             print("Perfect navigation!")
             print("You quickly locate the maze exit and escape safely.")
+            
+            if not check_time():
+                return
+            
             return "complete"
         elif correct_paths == 2:
             print("After some wandering, you eventually find the exit.")
+            
+            if not check_time():
+                return
+            
             return "complete"
         else:
             print("You become lost and are trapped in the maze forever.")
