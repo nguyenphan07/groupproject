@@ -325,9 +325,9 @@ def dungeon() -> str | None:
             else:
                 print("Tie! The house always wins!")
         decision = game_over()
-        if decision == "1": 
+        if decision == "restart": 
             continue
-        if decision == "2":
+        if decision == "exit":
             break
         return #End the function while returning nothing
 
@@ -425,9 +425,9 @@ def maze_section() -> str | None:
         else:
             print("You become lost and are trapped in the maze forever.")
             decision = game_over()
-            if decision == "1": 
+            if decision == "restart": 
                 continue
-            if decision == "2":
+            if decision == "exit":
                 break
 
 
