@@ -11,7 +11,7 @@ NAME: str = input("Please enter your character's name: ") # Allow the player to 
 print(f"Welcome {NAME} to the game!")
 
 TIME_LIMIT = 600  # 10 minute time limit to finish the adventure
-START_TIME = time.time()
+START_TIME = time.time() # https://docs.python.org/3/library/time.html#time.time()
 #Functions
 
 def validation_check(choice: str, possibility: list[str]) -> str:
@@ -57,30 +57,26 @@ def game_over() -> str:
 def check_time() -> bool:
     """
     Checks how much time has elapsed and how much the player has left
-
+    
     Returns
     -------
     bool
         true if time there is time remaining, and false if there is not
     """
-    try:
-        elapsed = time.time() - START_TIME
-        remaining = TIME_LIMIT - elapsed
+    elapsed = time.time() - START_TIME 
+    remaining = TIME_LIMIT - elapsed
 
-        print("\n=== TIME CHECK ===")
-        print(f"Time elapsed: {int(elapsed)} seconds")
-        print(f"Time remaining: {max(0, int(remaining))} seconds")
+    print("\n=== TIME CHECK ===")
+    print(f"Time elapsed: {int(elapsed)} seconds")
+    print(f"Time remaining: {max(0, int(remaining))} seconds")
 
-        if remaining <= 0:
-            print("Time has run out!")
-            print("Game Over!")
-            return False
-
-        return True
-
-    except Exception:
-        print("Timer error.")
+    if remaining <= 0:
+        print("Time has run out!")
+        print("Game Over!")
         return False
+
+    return True
+
 
 def random_event(strength_random: int) -> tuple:
     """Adding random events in dark forest
