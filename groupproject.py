@@ -1,19 +1,21 @@
 """
     group_project.py
-    Jack    Nguyen  Daniel
-    group 5 project about choose your own journey game
+    Nguyen Jack Daniel
+    Group 5 Project: Choose your own adventure game.
 """
-#System import
+
+# System Import
 from random import randint
 import time
-#Global Variable
+
+# Global Variable
 NAME: str = input("Please enter your character's name: ") # Allow the player to name their character
 print(f"Welcome {NAME} to the game!")
 
 TIME_LIMIT = 600  # 10 minute time limit to finish the adventure
 START_TIME = time.time() # https://docs.python.org/3/library/time.html#time.time()
-#Functions
 
+# Functions
 def validation_check(choice: str, possibility: list[str]) -> str:
     """
     Checks if user's input is eligible
@@ -23,13 +25,13 @@ def validation_check(choice: str, possibility: list[str]) -> str:
         choice: str
             the input from the user
         possibility: list[str]
-            the list of possible choices users can put
+            the list of possible choices users can input
     Returns:
     ------
         str
             the final input that is in the list of possible choices
     """
-    while not choice in possibility: # Activates if user inputs an ineligible choice, looping until user input a possible choice
+    while not choice in possibility: # Activates if user inputs an invalid choice, looping until user input a valid choice
         choice = input("Not an option, please try again: ")
     return choice # The function returns a possible choice (passed validation check)
 
@@ -43,6 +45,7 @@ def game_over() -> str:
         either 'restart' to restart the chapter or 'exit' to exit the game
     """
     print("GAME OVER! Would you like to: \n1. Restart the chapter \n2. Exit the game")
+
     while True:
         try:
             choice = int(input("Type '1' or '2': "))
@@ -54,21 +57,25 @@ def game_over() -> str:
                 print("Please type a valid number!")
         except ValueError:
             print("Error! Remember to type in a number!")
+
 def check_time() -> bool:
     """
-    Checks how much time has elapsed and how much the player has left
-    
+    Checks how much time has elapsed and how much time the player has remaining
+
     Returns
     -------
+        remaining time in seconds
+        'Game Over!' if there is no time remaining
     bool
-        true if time there is time remaining, and false if there is not
+        true if there is time remaining, and false if there is not
     """
-    elapsed = time.time() - START_TIME 
+    elapsed = time.time() - START_TIME
     remaining = TIME_LIMIT - elapsed
 
     print("\n=== TIME CHECK ===")
     print(f"Time elapsed: {int(elapsed)} seconds")
     print(f"Time remaining: {max(0, int(remaining))} seconds")
+    print()
 
     if remaining <= 0:
         print("Time has run out!")
@@ -77,15 +84,14 @@ def check_time() -> bool:
 
     return True
 
-
 def random_event(strength_random: int) -> tuple:
-    """Adding random events in dark forest
-    
+    """
+    Adding random events in dark forest
+
     Parameters:
     ------
         strength_random: int
             The total strength points the player has before this random event occurs
-    
     Returns:
     ------
         tuple
@@ -96,26 +102,26 @@ def random_event(strength_random: int) -> tuple:
         "shield": 5,
         "bow & arrows": 3
     }
-    treasure_order: list[str] = ["sword", "shield", "bow & arrows"] # to easily organize the treasure in the dictionary
-    monster: dict[str, int] ={
-        "wolf": 10,
+    treasure_order: list[str] = ["sword", "shield", "bow & arrows"] # To easily organize the treasure in the dictionary
+    monster: dict[str, int] ={ # Names and values of monsters you encounter
+        "wolf": 10, 
         "piranha plant": 15,
         "bear": 20
     }
-    monster_order: list[str] = ["wolf", "piranha plant", "bear"] # to easily organize the monster in the dictionary
-
-    monster_gain: dict [str, int] ={
+    monster_order: list[str] = ["wolf", "piranha plant", "bear"] # To easily organize the monster in the dictionary
+    monster_gain: dict [str, int] ={    # To give players strength points as rewards when defeating a monster
         "wolf": 4,
         "piranha plant": 8,
         "bear": 12
-    } # to give players strength points as rewards when defeating a monster
-    i = randint(1,100) # Use to generate probability, (30% that a treasure will be found, 70% to encounter a random monster)
+    }
+    i = randint(1,100) # Use to generate probability; (30% that a treasure will be found, 70% to encounter a random monster)
+
     if i <= 30: # 30% (gets treasure)
         i = randint(0,len(treasure_order) - 1) # Now this variable is used to randomly determine the treasure the player got
         print(f"You found a treasure!. it was a {treasure_order[i]}.\nYou gained {treasure[treasure_order[i]]} strength points!. You now have {strength_random + treasure[treasure_order[i]]} total.")
         strength_random += treasure[treasure_order[i]]
-    else: # 70% (faces monster)
 
+    else: # 70% (faces monster)
         i = randint(0,len(monster_order) - 1)
         print(f"A monster appeared! You are facing a {monster_order[i]}\n you need at least {monster[monster_order[i]]} strength points to beat it, you currently have {strength_random} points total.")
         print("Fight it?\n1. Fight\n2. Run")
@@ -123,68 +129,65 @@ def random_event(strength_random: int) -> tuple:
         possibility = ["1", "2"]
         decision = validation_check(decision, possibility)
 
-
         if decision == "1" and strength_random >= monster[monster_order[i]]: # Player choose to fight and has enough or more points to defeat the monster
             print(f"You have defeated the {monster_order[i]}! You have gained {monster_gain[monster_order[i]]} strength points from successfully defeating the monster.")
             strength_random += monster_gain[monster_order[i]]
             print(f"You now have {strength_random} strength points total.")
-
-
-        elif decision == "2": #Player choose to run
+        elif decision == "2": # Player choose to run
             print("You ran away successfully. What an inconvenience!")
-
-
-        else: #Player choose to fight but does not have enough strength points
+        else: # Player choose to fight but does not have enough strength points
             print(f"You have been slain by the {monster_order[i]}.")
             return game_over(), strength_random
-            
+
     return "alive", strength_random
 
 def dark_forest() -> str | None:
-    """Function to run dark forest chapter"""
+    """
+    Runs the dark forest section
+
+    Returns
+    -------
+        str
+            choices based on the player's chosen path
+    """
     while True: # A loop, intention is when the player loses and wishes to restart, the loop will be activated
-        starting_strength: int = 10 # stored so when player restarts, their strength is reset
+        starting_strength: int = 10 # Stored so when player restarts, their strength is reset
         strength: int = starting_strength
         print("+-----------------------------------------------------------------+")
         print("You wake up in a dark forest. As you navigate, you notice 2 distinct paths to follow: \n1. A dim light illuminating at a distance \n2. A dark path leading deeper into the forest.")
         decision: str = input("What should you do? Type '1' or '2': ")
         two_possibility: list[str] = ["1", "2"] # Created a list of 2 possible choices that the user can input
-        decision = validation_check(decision, two_possibility) #validate check user's input
-
-
+        decision = validation_check(decision, two_possibility) # Validate check user's input
         print("+-----------------------------------------------------------------+")
+
         if decision == "1": # Follow the light
             print("You found a cabin, though it seems like no one is inside.\n1. Go in the house \n2. Search around for items.")
             decision = input("What should you do? Type '1' or '2': ")
             decision = validation_check(decision, two_possibility)
             print("+-----------------------------------------------------------------+")
 
-
-            if decision == "1": #Go inside the house
+            if decision == "1": # Go inside the house
                 print("The door opens on its own. \n\"Were you not taught to not enter other's property without consent?\" A voice comes inside the house.")
                 print("Upon you, a witch appears. \"Oh you must be new here. You see, this is no ordinary forest.\n This whole forest is an entity, hungrily sucking living beings from different dimensions to feel fulfilled.\"")
                 print("\"If you want to escape. You must find the dungeon hidden somewhere in the center of the forest.\n Because I pity you, here are some items that can help you\"")
                 strength += 3
                 print(f"You gained 3 strength points! Now you have {strength} total.")
-
-
             else: # Search around for items
                 print("You found nothing, but a piece of paper that might explain why you're here. Read it?\n1. Yes\n2. No")
                 decision = input("Type '1' or '2'")
                 print("+-----------------------------------------------------------------+")
                 decision = validation_check(decision, two_possibility)
+
                 if decision == "1": # Read the note
                     print("\"What a nuisance! This forest has been sucking creatures from all over the places. Monsters, humans, animals, nothing is safe.\n I wish the dungeon of the forest is upon me right now! So I can escape this wicked place.")
+
             print("You left the cabin. Following a path that seems to be leading to somewhere...")
 
-
-
-        else: #Follow the dark path
+        else: # Follow the dark path
             print("As you move forward. The path eventually branches out. You notice two paths\n1. A straight path\n2. A wavy path")
             decision = input("Which path should you take? Type '1' or '2': ")
             print("+-----------------------------------------------------------------+")
             decision = validation_check(decision, two_possibility)
-
 
             if decision == "1": # Follow the straight path
                 print("You found a skeleton, full of gears. You decided to take it to your advantage\n As you take off its gears, you noticed a diary. Ready it?\n1. Yes\n2. No")
@@ -192,165 +195,135 @@ def dark_forest() -> str | None:
                 print("+-----------------------------------------------------------------+")
                 decision = validation_check(decision, two_possibility)
 
-
                 if decision == "1": # Read the diary
                     print("\"Oh I wish what that witch said was true. I've been going everywhere to find the dungeon to escape.\n Guess there is no luck for me. I hope I can make it out. This forest sucked me and other horrible creatures in. I wonder what is up with it...")
+
                 strength += 5
                 print(f"You have successfully acquired new gears. Now you have {strength} strength points total.")
                 print("You kept moving forward, making turns based on your intuition...")
 
-                
-            else: #Follow the wavy path
+            else: # Follow the wavy path
                 print("The path gets darker and darker. Suddenly, you don't know where you are anymore. You are lost.")
                 decision = game_over()
                 if decision == "restart":
                     strength = starting_strength
                     continue
                 else:
-                    return #end the function while returning nothing
-                
-        for i in range(3): # intended 3 randomized events
+                    return # End the function while returning nothing
+
+        for i in range(3): # Intended 3 randomized events
             print("+-----------------------------------------------------------------+")
             print("continue? press '1'")
             one_possibility = ['1']
             decision = input()
             decision = validation_check(decision, one_possibility)
             status, strength = random_event(strength)
+
             if status != "alive":
                 break
-            
-        if status == "restart": #Restarts the chapter
+
+        if status == "restart": # Restarts the chapter
             strength = starting_strength
             continue
-        elif status == "exit": #Exit the chapter
+        elif status == "exit": # Exit the chapter
             return
         print("You finally found the dungeon hidden inside the forest. Wondering what's waiting for you... Chapter 1 complete!")
 
         if not check_time():
             return
-       
+        
         return "complete"
 
-
-### DUNGEON CHAPTER OVERALL (JACK)###
-# Should we have impact decisions that carry through our different zones?
-# One correct path 
-# Daniel has exit message in his code
-
-### IDEAS FOR THE DUNGEON ###
-# DIE Dungeon, Dungeon of death -> "Time to Die" 
-# Dice choices - Six Sided, D20, even/odd
-# Fully random to get through? just an RNG check
-# Play a dice game (Yatzee, craps, gambling) win to get past
-
-## Dice used for randomness
-## Other lists and dictionaries used 
 def dungeon() -> str | None:
-    "Runs the dungeon portion of the game."
-    while True:
-        # d6 = random.randint(1, 6) #WIP
-        # d20 = random.randint(1, 20)
-        # cards: dict[str, int] = { # Name and value of cards
-        #     "Ace": 1,
-        #     "Two": 2,
-        #     "Three": 3,
-        #     "Four": 4,
-        #     "Five": 5,
-        #     "Six": 6,
-        #     "Seven": 7,
-        #     "Eight": 8,
-        #     "Nine": 9,
-        #     "Ten": 10,
-        #     "Jack": 10,
-        #     "Queen": 10,
-        #     "King": 10,
-        #     "Ace High": 11
-        # } 
+    """
+    Runs a 'fair' game of blackjack
 
-        # print("PLACEHOLDER INTRO")
+    Returns
+    -------
+    str
+        returns either a win or loss; restart chapter or continue to next section
+    """
+    while True:
         print(f"{NAME}, You are in the Dungeon of ... Die\n")
         print("")
+        print("Let's play a game of BlackJack. I assume you know the rules.")
 
-        # player_choice = int(input()) #WIP
-        # if player_choice == 1:
-        #     print("Good choice, Now choose a die to work with:\n1) 20 Sided Die\n2) Six Sided Die")
-        # elif player_choice == 2:
-        #     print("")
-        # else:
-        #     print("Invalid input, try again")
-        #     player_choice = int(input())
-
-        print("Let's play a game called BlackJack. I assume you know the rules.")
-        player = randint(2, 11) #Get a starting value for the player
-        dealer = randint(17, 22) #Get a value of the dealer
-        print(f" Your current value is {player}")
-
+        player = randint(2, 11) # Get a starting value for the player
+        dealer = randint(17, 23) # Get a value for the dealer
+        print(f" You currently on {player}")
         print("'Hit' or 'Stand'?")
 
         bet: str = input("Press '1' for Hit, press '2' for Stand: ")
         two_possibility: list[str] = ["1", "2"]
         bet = validation_check(bet, two_possibility)
-        while bet == "1": #Hit
-            draw = randint(2, 11) #Draw a random card
-            player += draw
 
+        while bet == "1": # Hit
+            draw = randint(2, 11) # Draw a random card
+            player += draw
             print(f"You are on {player}")
-            
+
             if player > 21:
                 print("You Busted! Game Over!")
-                break #break the 'hit' loop because player has lost
+                break # Break the 'hit' loop because player has lost
+
             bet = input("Continue? Press '1' for Hit, press '2' for Stand: ")
             bet = validation_check(bet, two_possibility)
 
-
         if player <= 21:
-            print(f"Dealer's total:, {dealer}")
+            print(f"Dealer's total: {dealer}")
 
             if dealer > 21:
                 print("Dealer busts! You win!")
-                
+
                 if not check_time():
                     return
-                
-                return "complete" #End the function while returning "complete"
+
+                return "complete" # End the function while returning "complete"
+
             elif player > dealer:
                 print("You win!")
 
                 if not check_time():
                     return
-                
-                return "complete" #End the function while returning "complete"
+
+                return "complete" # End the function while returning "complete"
+
             elif player < dealer:
                 print("Dealer wins!")
             else:
                 print("Tie! The house always wins!")
+
         decision = game_over()
-        if decision == "restart": 
+        if decision == "restart":
             continue
         if decision == "exit":
             break
-        return #End the function while returning nothing
+        return # End the function while returning nothing
 
-"""Daniel's maze section """
-def maze_section() -> str | None: 
+def maze_section() -> str | None:
     """
     Runs the maze portion of the adventure game.
-    The player must make choices to find the exit.
+
+    Returns
+    -------
+    str
+        choices based on the player's chosen path 
     """
     while True:
         print("\n=== THE ANCIENT MAZE ===")
         print("You leave the dungeon and enter a stone maze.")
         print("Find the exit before you get lost!\n")
-
         correct_paths: int = 0
 
         # Choice 1
         while True:
             choice1: str = input(
                 "You reach your first intersection.\n"
-                "Choose LEFT, RIGHT, or FORWARD: ").lower() #converts user input to lower case to prevent discrepancies
+                "Choose LEFT, RIGHT, or FORWARD: ").lower() # Converts user input to lowercase to prevent discrepancies
+
             if choice1 in ["left", "right", "forward"]:
-                break # break is used to stop the loop if user enters correct input
+                break # Break is used to stop the loop if user enters correct input
+
             print("Invalid choice. Please type LEFT, RIGHT, or FORWARD.")
 
         if choice1 == "left":
@@ -410,26 +383,25 @@ def maze_section() -> str | None:
         if correct_paths >= 3:
             print("Perfect navigation!")
             print("You quickly locate the maze exit and escape safely.")
-            
+
             if not check_time():
                 return
-            
             return "complete"
+
         elif correct_paths == 2:
             print("After some wandering, you eventually find the exit.")
-            
+
             if not check_time():
                 return
-            
             return "complete"
+
         else:
             print("You become lost and are trapped in the maze forever.")
             decision = game_over()
-            if decision == "restart": 
+            if decision == "restart":
                 continue
             if decision == "exit":
                 break
-
 
 if __name__ == "__main__":
 
@@ -438,6 +410,3 @@ if __name__ == "__main__":
             if maze_section() == "complete":
                 print("== END OF MAZE ==")
                 print(f"Congrats {NAME}, you have beat the game!")
-
-
-
