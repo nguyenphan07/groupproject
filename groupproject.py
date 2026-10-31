@@ -10,9 +10,9 @@ import time
 
 # Global Variable
 NAME: str = input("Please enter your character's name: ") # Allow the player to name their character
-print(f"Welcome {NAME} to the game!")
+print(f"Welcome to the game, {NAME}!")
 
-TIME_LIMIT = 600  # 10 minute time limit to finish the adventure
+TIME_LIMIT = 300  # 5 minute time limit to finish the adventure
 START_TIME = time.time() # https://docs.python.org/3/library/time.html#time.time()
 
 # Functions
@@ -74,12 +74,21 @@ def check_time() -> bool:
 
     print("\n=== TIME CHECK ===")
     print(f"Time elapsed: {int(elapsed)} seconds")
-    print(f"Time remaining: {max(0, int(remaining))} seconds")
-    print()
+    
+    if remaining > 200:
+        print("The shadows are keeping their distance...")
+    elif remaining > 100:
+        print("The shadows are slowly creeping closer...")
+    elif remaining > 50:
+        print("The shadows are getting close now!")
+    else:
+        print("The shadows are reaching out!")
 
-    if remaining <= 0:
-        print("Time has run out!")
-        print("Game Over!")
+    print(f"Time remaining: {int(remaining)} seconds")
+
+    if remaining <= 0:  # Player has run out of time
+        print("\nThe shadows grab you!")
+        print(f"{NAME} has been consumed by the shadows.")
         return False
 
     return True
@@ -154,7 +163,7 @@ def dark_forest() -> str | None:
         starting_strength: int = 10 # Stored so when player restarts, their strength is reset
         strength: int = starting_strength
         print("+-----------------------------------------------------------------+")
-        print("You wake up in a dark forest. As you navigate, you notice 2 distinct paths to follow: \n1. A dim light illuminating at a distance \n2. A dark path leading deeper into the forest.")
+        print("You wake up in a dark forest surrounded by ominous shadows. As you navigate, you notice 2 distinct paths to follow: \n1. A dim light illuminating at a distance \n2. A dark path leading deeper into the forest.")
         decision: str = input("What should you do? Type '1' or '2': ")
         two_possibility: list[str] = ["1", "2"] # Created a list of 2 possible choices that the user can input
         decision = validation_check(decision, two_possibility) # Validate check user's input
@@ -244,7 +253,7 @@ def dungeon() -> str | None:
         returns either a win or loss; restart chapter or continue to next section
     """
     while True:
-        print(f"{NAME}, You are in the Dungeon of ... Die\n")
+        print(f"\n{NAME}, You are in the Dungeon of ... Die")
         print("")
         print("Let's play a game of BlackJack. I assume you know the rules.")
 
